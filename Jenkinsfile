@@ -38,17 +38,24 @@ pipeline {
     } 
 
     stage('SonarCloud Analysis') {
-      steps {
-        sh '''
-          # Download SonarScanner CLI
-          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-          unzip -q sonar-scanner.zip
-          export PATH=$PATH:$(pwd)/sonar-scanner-4.8.0.2856-linux/bin
-          
-          # Run SonarCloud scan
-          sonar-scanner -Dsonar.login=$SONAR_TOKEN
-        '''
-      }
+        steps {
+            sh '''
+                # Remove existing SonarScanner directory if it exists
+                rm -rf sonar-scanner-4.8.0.2856-linux
+
+                # Download SonarScanner CLI
+                curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+
+                # Unzip and overwrite without prompt
+                unzip -o -q sonar-scanner.zip
+
+                # Add SonarScanner to PATH
+                export PATH=$PATH:$(pwd)/sonar-scanner-4.8.0.2856-linux/bin
+
+                # Run SonarCloud scan
+                sonar-scanner -Dsonar.login=$SONAR_TOKEN
+            '''
+        }
     }
   } 
 }
