@@ -43,17 +43,24 @@ pipeline {
         stage('SonarCloud Analysis') {
             steps {
                 withEnv([
-                    'JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64',  // adjust path if different
-                    'PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin:$PATH'
+                    'JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64',
+                    'PATH+JAVA=$JAVA_HOME/bin'
                 ]) {
                     sh '''
-                        curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-                        unzip -o -q sonar-scanner.zip
-                        export PATH=$PWD/sonar-scanner-4.8.0.2856-linux/bin:$PATH
+                        # Download SonarScanner if not already
+                        if [ ! -d "sonar-scanner-4.8.0.2856-linux" ]; then
+                            curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+                            unzip -o -q sonar-scanner.zip
+                        fi
+
+                        # Use quoted path to avoid issues with spaces
+                        export PATH="$PWD/sonar-scanner-4.8.0.2856-linux/bin:$PATH"
+
                         sonar-scanner -Dsonar.login=$SONAR_TOKEN
                     '''
                 }
             }
         }
+
     }
 }
