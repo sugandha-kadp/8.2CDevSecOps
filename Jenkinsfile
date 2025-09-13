@@ -43,9 +43,9 @@ pipeline {
       steps {
         withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
           sh '''
-            curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-windows.zip
-            unzip -o sonar-scanner.zip
-            export PATH=$PATH:$(pwd)/sonar-scanner-5.0.1.3006-windows/bin
+            curl -sSLo sonar-scanner-cli.tar.gz https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+            tar -xzf sonar-scanner-cli.tar.gz
+            export PATH=$PATH:$(pwd)/sonar-scanner-5.0.1.3006-linux/bin
             sonar-scanner -Dsonar.login=$SONAR_TOKEN
           '''
         }
