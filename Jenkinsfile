@@ -32,5 +32,24 @@ pipeline {
         sh 'npm audit || true' // This will show known CVEs in the output 
       } 
     } 
+    stage('SonarQube Scan') {
+      steps {
+        withSonarQubeEnv('SonarQube') {
+          sh 'sonar-scanner'
+        }
+      }
+    }
+    stage('SonarCloud Analysis') {
+      steps {
+        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+          sh '''
+            curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-windows.zip
+            unzip -o sonar-scanner.zip
+            export PATH=$PATH:$(pwd)/sonar-scanner-5.0.1.3006-windows/bin
+            sonar-scanner -Dsonar.login=$SONAR_TOKEN
+          '''
+        }
+      }
+    }
   } 
 }
